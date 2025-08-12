@@ -1,306 +1,145 @@
 'use client';
 
-import { useState } from 'react';
-import { Share2, Facebook, Twitter, Linkedin, MessageCircle, Link as LinkIcon, Check, Copy } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
-import { trackPostShare } from '@/lib/analytics';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import React, { useState } from 'react';
+import { Share2, Twitter, Facebook, Linkedin, Copy, Check } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import analytics from '@/lib/analytics';
 
 interface SocialShareProps {
-  url: string;
+  postId: string;
   title: string;
-  description: string;
-  postId?: string;
-  image?: string;
-  className?: string;
-  variant?: 'default' | 'compact' | 'floating';
+  url: string;
+  excerpt?: string;
 }
 
-export function SocialShare({ 
-  url, 
-  title, 
-  description, 
-  postId, 
-  image, 
-  className = '',
-  variant = 'default' 
-}: SocialShareProps) {
-  const [isOpen, setIsOpen] = useState(false);
+const SocialShare: React.FC<SocialShareProps> = ({ postId, title, url, excerpt }) => {
   const [copied, setCopied] = useState(false);
   const [shareCount, setShareCount] = useState(0);
 
-  // Track share event
-  const trackShare = async (platform: string) => {
+  const shareData = {
+    title: title,
+    text: excerpt || `Check out this article: ${title}`,
+    url: url,
+  };
+
+  const handleShare = async (platform: string) => {
     try {
-      if (postId) {
-        // Track in Supabase
-        await supabase.from('post_engagement').insert({
-          post_id: postId,
-          action_type: 'share',
-          timestamp: new Date().toISOString(),
-          referrer: platform,
-          session_id: 'anonymous'
-        });
-
-        // Update post share count
-        const { data: post } = await supabase
-          .from('posts')
-          .select('share_count')
-          .eq('id', postId)
-          .single();
-
-        if (post) {
-          await supabase
-            .from('posts')
-            .update({ share_count: (post.share_count || 0) + 1 })
-            .eq('id', postId);
-          
-          setShareCount(prev => prev + 1);
-        }
-
-        // Track in Google Analytics
-        trackPostShare(postId, title, platform, 'sports');
+      let shareUrl = '';
+      
+      switch (platform) {
+        case 'twitter':
+          shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`;
+          break;
+        case 'facebook':
+          shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+          break;
+        case 'linkedin':
+          shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+          break;
+        case 'native':
+          if (navigator.share) {
+            await navigator.share(shareData);
+          }
+          break;
       }
+
+      if (shareUrl) {
+        window.open(shareUrl, '_blank', 'width=600,height=400');
+      }
+
+      // Track share event
+      await analytics.trackPostShare(postId, title, platform, 'sports');
+      
+      // Update share count
+      setShareCount(prev => prev + 1);
+      
+      // Update database
+      await supabase
+        .from('posts')
+        .update({ share_count: shareCount + 1 })
+        .eq('id', postId);
+
     } catch (error) {
-      console.error('Error tracking share:', error);
+      console.error('Error sharing:', error);
     }
   };
 
-  // Share handlers
-  const shareToFacebook = () => {
-    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-    window.open(shareUrl, '_blank', 'width=600,height=400');
-    trackShare('facebook');
-  };
-
-  const shareToTwitter = () => {
-    const text = `${title}\n\n${description}`;
-    const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
-    window.open(shareUrl, '_blank', 'width=600,height=400');
-    trackShare('twitter');
-  };
-
-  const shareToLinkedIn = () => {
-    const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
-    window.open(shareUrl, '_blank', 'width=600,height=400');
-    trackShare('linkedin');
-  };
-
-  const shareToWhatsApp = () => {
-    const text = `${title}\n\n${description}\n\n${url}`;
-    const shareUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
-    window.open(shareUrl, '_blank');
-    trackShare('whatsapp');
-  };
-
-  const copyToClipboard = async () => {
+  const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
-      trackShare('copy_link');
+      
+      // Track copy event
+      await analytics.trackPostShare(postId, title, 'copy', 'sports');
+      
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      console.error('Failed to copy:', error);
+      console.error('Error copying:', error);
     }
   };
 
-  // Native share API for mobile
-  const nativeShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title,
-          text: description,
-          url
-        });
-        trackShare('native_share');
-      } catch (error) {
-        console.error('Error sharing:', error);
-      }
-    }
-  };
-
-  // Check if native sharing is available
-  const canShare = typeof navigator !== 'undefined' && navigator.share;
-
-  if (variant === 'compact') {
-    return (
-      <div className={`relative ${className}`}>
+  return (
+    <div className="flex flex-col space-y-4 p-6 bg-white rounded-lg shadow-sm border border-gray-100">
+      <div className="flex items-center space-x-2">
+        <Share2 className="w-5 h-5 text-gray-600" />
+        <h3 className="text-lg font-semibold text-gray-900">Share this article</h3>
+      </div>
+      
+      <div className="flex flex-wrap gap-3">
         <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 hover:text-navy transition-colors rounded-lg hover:bg-gray-100"
+          onClick={() => handleShare('twitter')}
+          className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
         >
-          <Share2 className="w-4 h-4" />
-          Share
+          <Twitter className="w-4 h-4" />
+          <span>Twitter</span>
         </button>
         
-        {isOpen && (
-          <>
-            <div 
-              className="fixed inset-0 z-40" 
-              onClick={() => setIsOpen(false)}
-            />
-            <div className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 p-2 z-50 min-w-[200px]">
-              <div className="space-y-1">
-                {canShare && (
-                  <button
-                    onClick={() => { nativeShare(); setIsOpen(false); }}
-                    className="flex items-center gap-3 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-                  >
-                    <Share2 className="w-4 h-4" />
-                    Share
-                  </button>
-                )}
-                <button
-                  onClick={() => { shareToFacebook(); setIsOpen(false); }}
-                  className="flex items-center gap-3 w-full px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors"
-                >
-                  <Facebook className="w-4 h-4" />
-                  Facebook
-                </button>
-                <button
-                  onClick={() => { shareToTwitter(); setIsOpen(false); }}
-                  className="flex items-center gap-3 w-full px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-400 rounded-md transition-colors"
-                >
-                  <Twitter className="w-4 h-4" />
-                  Twitter
-                </button>
-                <button
-                  onClick={() => { shareToLinkedIn(); setIsOpen(false); }}
-                  className="flex items-center gap-3 w-full px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors"
-                >
-                  <Linkedin className="w-4 h-4" />
-                  LinkedIn
-                </button>
-                <button
-                  onClick={() => { shareToWhatsApp(); setIsOpen(false); }}
-                  className="flex items-center gap-3 w-full px-3 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-md transition-colors"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  WhatsApp
-                </button>
-                <button
-                  onClick={() => { copyToClipboard(); setIsOpen(false); }}
-                  className="flex items-center gap-3 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-                >
-                  {copied ? <Check className="w-4 h-4 text-green-600" /> : <LinkIcon className="w-4 h-4" />}
-                  {copied ? 'Copied!' : 'Copy Link'}
-                </button>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-    );
-  }
-
-  if (variant === 'floating') {
-    return (
-      <div className={`fixed right-4 top-1/2 transform -translate-y-1/2 z-50 ${className}`}>
-        <div className="bg-white rounded-full shadow-lg border border-gray-200 p-2">
-          <div className="flex flex-col gap-2">
-            {canShare && (
-              <button
-                onClick={nativeShare}
-                className="p-2 text-gray-600 hover:text-navy hover:bg-gray-100 rounded-full transition-colors"
-                title="Share"
-              >
-                <Share2 className="w-5 h-5" />
-              </button>
-            )}
-            <button
-              onClick={shareToFacebook}
-              className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
-              title="Share on Facebook"
-            >
-              <Facebook className="w-5 h-5" />
-            </button>
-            <button
-              onClick={shareToTwitter}
-              className="p-2 text-gray-600 hover:text-blue-400 hover:bg-blue-50 rounded-full transition-colors"
-              title="Share on Twitter"
-            >
-              <Twitter className="w-5 h-5" />
-            </button>
-            <button
-              onClick={shareToLinkedIn}
-              className="p-2 text-gray-600 hover:text-blue-700 hover:bg-blue-50 rounded-full transition-colors"
-              title="Share on LinkedIn"
-            >
-              <Linkedin className="w-5 h-5" />
-            </button>
-            <button
-              onClick={copyToClipboard}
-              className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors"
-              title="Copy Link"
-            >
-              {copied ? <Check className="w-5 h-5 text-green-600" /> : <Copy className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Default variant
-  return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      <span className="text-sm font-medium text-gray-700">Share:</span>
-      <div className="flex items-center gap-2">
-        {canShare && (
+        <button
+          onClick={() => handleShare('facebook')}
+          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <Facebook className="w-4 h-4" />
+          <span>Facebook</span>
+        </button>
+        
+        <button
+          onClick={() => handleShare('linkedin')}
+          className="flex items-center space-x-2 px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors"
+        >
+          <Linkedin className="w-4 h-4" />
+          <span>LinkedIn</span>
+        </button>
+        
+        {typeof window !== 'undefined' && 'navigator' in window && 'share' in navigator && (
           <button
-            onClick={nativeShare}
-            className="p-2 text-gray-600 hover:text-navy hover:bg-gray-100 rounded-lg transition-colors"
-            title="Share"
+            onClick={() => handleShare('native')}
+            className="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
           >
-            <Share2 className="w-5 h-5" />
+            <Share2 className="w-4 h-4" />
+            <span>Share</span>
           </button>
         )}
+        
         <button
-          onClick={shareToFacebook}
-          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-          title="Share on Facebook"
+          onClick={handleCopy}
+          className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+            copied 
+              ? 'bg-green-500 text-white' 
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
         >
-          <Facebook className="w-5 h-5" />
-        </button>
-        <button
-          onClick={shareToTwitter}
-          className="p-2 text-gray-600 hover:text-blue-400 hover:bg-blue-50 rounded-lg transition-colors"
-          title="Share on Twitter"
-        >
-          <Twitter className="w-5 h-5" />
-        </button>
-        <button
-          onClick={shareToLinkedIn}
-          className="p-2 text-gray-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
-          title="Share on LinkedIn"
-        >
-          <Linkedin className="w-5 h-5" />
-        </button>
-        <button
-          onClick={shareToWhatsApp}
-          className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-          title="Share on WhatsApp"
-        >
-          <MessageCircle className="w-5 h-5" />
-        </button>
-        <button
-          onClick={copyToClipboard}
-          className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
-          title="Copy Link"
-        >
-          {copied ? <Check className="w-5 h-5 text-green-600" /> : <Copy className="w-5 h-5" />}
+          {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+          <span>{copied ? 'Copied!' : 'Copy Link'}</span>
         </button>
       </div>
+      
       {shareCount > 0 && (
-        <span className="text-xs text-gray-500 ml-2">
-          {shareCount} share{shareCount !== 1 ? 's' : ''}
-        </span>
+        <div className="text-sm text-gray-500">
+          {shareCount} {shareCount === 1 ? 'person' : 'people'} shared this article
+        </div>
       )}
     </div>
   );
-} 
+};
+
+export default SocialShare; 
