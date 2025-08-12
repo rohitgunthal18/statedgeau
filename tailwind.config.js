@@ -4,96 +4,158 @@ module.exports = {
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
-      // Australian Betting Theme Colors
       colors: {
-        navy: {
-          DEFAULT: '#1a237e',
-          light: '#3949ab',
+        // Brand colors for Stat Edge AU
+        navy: '#1a237e',
+        golden: '#ffc107',
+        emerald: '#00c853',
+        coral: '#ff5722',
+        primary: {
+          50: '#e8eaf6',
+          100: '#c5cae9',
+          200: '#9fa8da',
+          300: '#7986cb',
+          400: '#5c6bc0',
+          500: '#3f51b5',
+          600: '#3949ab',
+          700: '#303f9f',
+          800: '#283593',
+          900: '#1a237e',
         },
-        golden: {
-          DEFAULT: '#ffc107',
-          light: '#ffca28',
+        secondary: {
+          50: '#fff8e1',
+          100: '#ffecb3',
+          200: '#ffe082',
+          300: '#ffd54f',
+          400: '#ffca28',
+          500: '#ffc107',
+          600: '#ffb300',
+          700: '#ffa000',
+          800: '#ff8f00',
+          900: '#ff6f00',
         },
-        emerald: {
-          DEFAULT: '#00c853',
-          light: '#26a69a',
+        success: {
+          50: '#e8f5e8',
+          100: '#c8e6c9',
+          200: '#a5d6a7',
+          300: '#81c784',
+          400: '#66bb6a',
+          500: '#4caf50',
+          600: '#43a047',
+          700: '#388e3c',
+          800: '#2e7d32',
+          900: '#1b5e20',
         },
-        coral: {
-          DEFAULT: '#ff5722',
-          light: '#ff7043',
+        warning: {
+          50: '#fff3e0',
+          100: '#ffe0b2',
+          200: '#ffcc80',
+          300: '#ffb74d',
+          400: '#ffa726',
+          500: '#ff9800',
+          600: '#fb8c00',
+          700: '#f57c00',
+          800: '#ef6c00',
+          900: '#e65100',
+        },
+        error: {
+          50: '#ffebee',
+          100: '#ffcdd2',
+          200: '#ef9a9a',
+          300: '#e57373',
+          400: '#ef5350',
+          500: '#f44336',
+          600: '#e53935',
+          700: '#d32f2f',
+          800: '#c62828',
+          900: '#b71c1c',
+        },
+        gray: {
+          50: '#fafafa',
+          100: '#f5f5f5',
+          200: '#eeeeee',
+          300: '#e0e0e0',
+          400: '#bdbdbd',
+          500: '#9e9e9e',
+          600: '#757575',
+          700: '#616161',
+          800: '#424242',
+          900: '#212121',
         },
       },
-      // Enhanced Typography
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        heading: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
-      // Enhanced Border Radius
-      borderRadius: {
-        'xl': '1.25rem',
-        '2xl': '1.5rem',
-        '3xl': '2rem',
+      fontSize: {
+        'xs': ['0.75rem', { lineHeight: '1rem' }],
+        'sm': ['0.875rem', { lineHeight: '1.25rem' }],
+        'base': ['1rem', { lineHeight: '1.5rem' }],
+        'lg': ['1.125rem', { lineHeight: '1.75rem' }],
+        'xl': ['1.25rem', { lineHeight: '1.75rem' }],
+        '2xl': ['1.5rem', { lineHeight: '2rem' }],
+        '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
+        '4xl': ['2.25rem', { lineHeight: '2.5rem' }],
+        '5xl': ['3rem', { lineHeight: '1' }],
+        '6xl': ['3.75rem', { lineHeight: '1' }],
+        '7xl': ['4.5rem', { lineHeight: '1' }],
+        '8xl': ['6rem', { lineHeight: '1' }],
+        '9xl': ['8rem', { lineHeight: '1' }],
       },
-      // Enhanced Shadows
-      boxShadow: {
-        'soft': '0 2px 15px 0 rgba(0, 0, 0, 0.1)',
-        'medium': '0 4px 20px 0 rgba(0, 0, 0, 0.15)',
-        'large': '0 10px 40px 0 rgba(0, 0, 0, 0.2)',
-        'xl': '0 20px 50px 0 rgba(0, 0, 0, 0.25)',
-      },
-      // Enhanced Animations
-      animation: {
-        'fade-in': 'fadeIn 0.6s ease-out',
-        'slide-in': 'slideIn 0.6s ease-out',
-        'pulse-soft': 'pulse 2s ease-in-out infinite',
-        'bounce-soft': 'bounce 1s ease-in-out infinite',
-      },
-      // Enhanced Gradients
-      backgroundImage: {
-        'gradient-primary': 'linear-gradient(135deg, #1a237e, #00c853)',
-        'gradient-secondary': 'linear-gradient(135deg, #ffc107, #ff5722)',
-        'gradient-accent': 'linear-gradient(135deg, #00c853, #ffc107)',
-      },
-      // Enhanced Spacing
       spacing: {
         '18': '4.5rem',
         '88': '22rem',
         '128': '32rem',
       },
-      // Enhanced Container
-      container: {
-        center: true,
-        padding: {
-          DEFAULT: '1rem',
-          sm: '1.5rem',
-          lg: '2rem',
-          xl: '2.5rem',
-          '2xl': '3rem',
+      animation: {
+        'fade-in': 'fadeIn 0.5s ease-in-out',
+        'slide-up': 'slideUp 0.3s ease-out',
+        'slide-down': 'slideDown 0.3s ease-out',
+        'bounce-subtle': 'bounceSubtle 2s infinite',
+        'pulse-slow': 'pulse 3s infinite',
+        'spin-slow': 'spin 3s linear infinite',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
         },
-        screens: {
-          sm: '640px',
-          md: '768px',
-          lg: '1024px',
-          xl: '1280px',
-          '2xl': '1536px',
+        slideUp: {
+          '0%': { transform: 'translateY(10px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
         },
+        slideDown: {
+          '0%': { transform: 'translateY(-10px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        bounceSubtle: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-5px)' },
+        },
+      },
+      borderRadius: {
+        '4xl': '2rem',
+      },
+      boxShadow: {
+        'soft': '0 2px 15px 0 rgba(0, 0, 0, 0.1)',
+        'medium': '0 4px 25px 0 rgba(0, 0, 0, 0.1)',
+        'hard': '0 10px 40px 0 rgba(0, 0, 0, 0.15)',
+        'inner-soft': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
+      },
+      backdropBlur: {
+        'xs': '2px',
       },
     },
   },
   plugins: [
-    // Custom utilities
-    function({ addUtilities }) {
-      addUtilities({
-        '.scrollbar-hide': {
-          /* Hide scrollbar for Chrome, Safari and Opera */
-          '-webkit-scrollbar': 'none',
-          /* Hide scrollbar for IE, Edge and Firefox */
-          '-ms-overflow-style': 'none',  /* IE and Edge */
-          'scrollbar-width': 'none',  /* Firefox */
-        }
-      })
-    }
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/aspect-ratio'),
   ],
-} 
+}
