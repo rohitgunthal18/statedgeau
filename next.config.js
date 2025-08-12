@@ -1,53 +1,74 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Enable experimental features for better performance
   experimental: {
-    optimizePackageImports: ['lucide-react'],
+    serverComponentsExternalPackages: ['@supabase/supabase-js'],
   },
+  
+  // Image optimization
   images: {
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    formats: ['image/webp', 'image/avif'],
+    minimumCacheTTL: 60,
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
-        port: '',
-        pathname: '/**',
       },
       {
         protocol: 'https',
-        hostname: 'source.unsplash.com',
-        port: '',
-        pathname: '/**',
+        hostname: 'picsum.photos',
       },
       {
         protocol: 'https',
-        hostname: 'vpmsbwxneclkwcplzvim.supabase.co',
-        port: '',
-        pathname: '/storage/v1/object/public/**',
-      },
+        hostname: '*.supabase.co',
+      }
     ],
-    formats: ['image/webp', 'image/avif'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
-  
-  // Enable static optimization
-  output: 'standalone',
-  poweredByHeader: false,
-  compress: true,
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  
-  // Performance optimizations
+
+  // Enable SWC minification for better performance
   swcMinify: true,
+
+  // Configure modular imports for better tree shaking
   modularizeImports: {
     'lucide-react': {
-      transform: 'lucide-react/dist/esm/icons/{{kebabCase member}}',
-      skipDefaultConversion: true,
+      transform: 'lucide-react/dist/esm/icons/{{member}}',
     },
   },
-  
-  // Bundle analysis
+
+  // Enhanced security headers
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
+          },
+        ],
+      },
+    ];
+  },
+
+  // Webpack configuration
   webpack: (config, { isServer }) => {
+    // Add fallbacks for client-side compatibility
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -56,16 +77,25 @@ const nextConfig = {
         tls: false,
       };
     }
+    
     return config;
   },
-  
-  // SEO and performance optimizations
-  env: {
-    SITE_NAME: 'Australian Betting Insights',
-    SITE_URL: process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
-      : 'http://localhost:3000',
-  },
-}
 
-module.exports = nextConfig 
+  // CSS configuration for production
+  experimental: {
+    optimizeCss: false, // Disable to prevent CSS issues
+    forceSwcTransforms: true,
+  },
+
+  // Ensure proper CSS handling
+  sassOptions: {
+    includePaths: ['./src'],
+  },
+
+  // Production optimizations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+};
+
+module.exports = nextConfig; 
