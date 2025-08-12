@@ -28,9 +28,6 @@ export const supabase = (() => {
           'X-Client-Info': 'stat-edge-au@1.0.0',
         },
       },
-      db: {
-        schema: 'public',
-      },
       realtime: {
         params: {
           eventsPerSecond: 2,
@@ -170,4 +167,4 @@ export type Database = {
   };
 };
 
-export default supabase;
+export default supabase; 
