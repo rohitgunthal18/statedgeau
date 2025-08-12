@@ -1,0 +1,241 @@
+# ===========================================
+# STAT EDGE AU - GITIGNORE CONFIGURATION
+# ===========================================
+# 
+# This file prevents sensitive data from being
+# committed to version control (GitHub)
+#
+# Owner: Rohit Gunthal
+# Platform: Stat Edge AU
+# ===========================================
+
+# DEPENDENCIES
+# ============
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ENVIRONMENT VARIABLES (CRITICAL - NEVER COMMIT!)
+# =================================================
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env*.local
+
+# NEXT.JS BUILD OUTPUTS
+# =====================
+.next/
+out/
+dist/
+build/
+
+# RUNTIME DATA
+# ============
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# COVERAGE DIRECTORY
+# ==================
+coverage/
+*.lcov
+.nyc_output
+
+# ESLINT CACHE
+# ============
+.eslintcache
+
+# OPTIONAL NPM CACHE
+# ==================
+.npm
+
+# OPTIONAL ESLINT CACHE
+# =====================
+.eslintcache
+
+# MICROBUNDLE CACHE
+# =================
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# OPTIONAL REPL HISTORY
+# =====================
+.node_repl_history
+
+# OUTPUT OF 'NPM PACK'
+# ====================
+*.tgz
+
+# YARN INTEGRITY FILE
+# ===================
+.yarn-integrity
+
+# PARCEL-BUNDLER CACHE
+# ====================
+.cache
+.parcel-cache
+
+# NEXT.JS BUILD / GENERATE OUTPUT
+# ===============================
+.next
+out
+
+# NUXT.JS BUILD / GENERATE OUTPUT
+# ===============================
+.nuxt
+dist
+
+# GATSBY FILES
+# ============
+.cache/
+public
+
+# VUEPRESS BUILD OUTPUT
+# =====================
+.vuepress/dist
+
+# SERVERLESS DIRECTORIES
+# ======================
+.serverless/
+
+# FUSEBOX CACHE
+# =============
+.fusebox/
+
+# DYNAMODB LOCAL FILES
+# ====================
+.dynamodb/
+
+# TERNJS PORT FILE
+# ================
+.tern-port
+
+# DATABASE FILES
+# ==============
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE AND EDITOR FILES
+# ====================
+# VSCode
+.vscode/
+!.vscode/extensions.json
+
+# WebStorm
+.idea/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# OPERATING SYSTEM FILES
+# ======================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# LOGS
+# ====
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# TEMPORARY FILES
+# ===============
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# BACKUP FILES
+# ============
+*.bak
+*.backup
+*.old
+
+# TESTING
+# =======
+.coverage
+.nyc_output
+coverage/
+
+# MISC
+# ====
+.vercel
+.turbo
+
+# ===========================================
+# IMPORTANT SECURITY NOTE:
+# ===========================================
+# The .env* files contain sensitive API keys
+# and database credentials. NEVER commit them!
+# 
+# If you accidentally commit them:
+# 1. Immediately rotate all API keys
+# 2. Change all passwords
+# 3. Remove from git history
+# =========================================== 
