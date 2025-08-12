@@ -1,11 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable experimental features for better performance
   experimental: {
-    serverComponentsExternalPackages: ['@supabase/supabase-js'],
+    swcMinify: true,
   },
-
-  // Image optimization configuration
   images: {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
@@ -14,21 +11,12 @@ const nextConfig = {
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
-
-  // Enable SWC minification for better performance
-  swcMinify: true,
-
-  // Optimize bundle size
   modularizeImports: {
     'lucide-react': {
       transform: 'lucide-react/dist/esm/icons/{{kebabCase member}}',
-      preventFullImport: true,
     },
   },
-
-  // Webpack configuration for compatibility
   webpack: (config, { isServer }) => {
-    // Fix for client-side builds
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -39,8 +27,6 @@ const nextConfig = {
     }
     return config;
   },
-
-  // Headers for better security and caching
   async headers() {
     return [
       {
@@ -56,20 +42,7 @@ const nextConfig = {
           },
           {
             key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
-          },
-        ],
-      },
-      {
-        source: '/site.webmanifest',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'application/manifest+json',
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            value: 'origin-when-cross-origin',
           },
         ],
       },
@@ -110,27 +83,59 @@ const nextConfig = {
         ],
       },
       {
-        source: '/og-:name.jpg',
+        source: '/site.webmanifest',
         headers: [
           {
+            key: 'Content-Type',
+            value: 'application/manifest+json',
+          },
+          {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            value: 'public, max-age=3600',
           },
         ],
       },
       {
-        source: '/twitter-:name.jpg',
+        source: '/robots.txt',
         headers: [
           {
+            key: 'Content-Type',
+            value: 'text/plain',
+          },
+          {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            value: 'public, max-age=3600',
+          },
+        ],
+      },
+      {
+        source: '/sitemap.xml',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/xml',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600',
+          },
+        ],
+      },
+      {
+        source: '/feed.xml',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/rss+xml',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600',
           },
         ],
       },
     ];
   },
-
-  // Redirects for SEO
   async redirects() {
     return [
       {
@@ -140,6 +145,10 @@ const nextConfig = {
       },
     ];
   },
+  swcMinify: true,
+  compress: true,
+  poweredByHeader: false,
+  generateEtags: false,
 };
 
 module.exports = nextConfig; 
